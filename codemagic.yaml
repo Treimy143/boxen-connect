@@ -1,0 +1,39 @@
+workflows:
+  android-workflow:
+    name: Android Release
+    max_build_duration: 60
+    environment:
+      flutter: 3.41.9
+      vars:
+        PUBLIC_TOKEN: Encrypted(...)  # In Codemagic UI setzen
+    scripts:
+      - name: Create secrets.dart
+        script: |
+          echo "const kPublicToken = '$PUBLIC_TOKEN';" > lib/core/secrets.dart
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Build APK
+        script: flutter build apk --release
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+
+  ios-workflow:
+    name: iOS Release
+    max_build_duration: 60
+    environment:
+      flutter: 3.41.9
+      xcode: latest
+      cocoapods: default
+      vars:
+        PUBLIC_TOKEN: Encrypted(...)  # In Codemagic UI setzen
+    scripts:
+      - name: Create secrets.dart
+        script: |
+          echo "const kPublicToken = '$PUBLIC_TOKEN';" > lib/core/secrets.dart
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Build iOS
+        script: |
+          flutter build ios --release --no-codesign
+    artifacts:
+      - build/ios/iphoneos/*.app
